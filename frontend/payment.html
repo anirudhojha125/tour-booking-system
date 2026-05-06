@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="padding-top: 90px; background: var(--light);">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                Tour<span>Book</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="tours.html">Tours</a></li>
+                <li><a href="bookings.html">Bookings</a></li>
+            </ul>
+            <div class="nav-buttons" id="navAuthButtons">
+                <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Payment Content -->
+    <section class="section">
+        <div style="max-width: 800px; margin: 0 auto; padding: 0 5%;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 style="font-size: 2.2rem; font-weight: 700; color: var(--dark); margin-bottom: 10px;">Complete Your Booking</h1>
+                <p style="color: var(--gray);">Secure payment processing</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                <!-- Payment Form -->
+                <div>
+                    <div id="paymentAlert"></div>
+                    
+                    <div style="background: var(--white); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow-md); margin-bottom: 25px;">
+                        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--dark);">Select Payment Method</h3>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
+                            <label style="display: flex; align-items: center; gap: 15px; padding: 20px; border: 2px solid var(--primary-color); border-radius: var(--radius-md); cursor: pointer; background: rgba(255, 107, 53, 0.05);">
+                                <input type="radio" name="paymentMethod" value="card" checked style="width: auto;">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: var(--dark);">Credit/Debit Card</div>
+                                    <div style="font-size: 0.85rem; color: var(--gray);">Visa, Mastercard, Amex</div>
+                                </div>
+                                <i class="fas fa-credit-card" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                            </label>
+                            
+                            <label style="display: flex; align-items: center; gap: 15px; padding: 20px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md); cursor: pointer;">
+                                <input type="radio" name="paymentMethod" value="upi" style="width: auto;">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: var(--dark);">UPI Payment</div>
+                                    <div style="font-size: 0.85rem; color: var(--gray);">Google Pay, PhonePe, Paytm</div>
+                                </div>
+                                <i class="fas fa-mobile-alt" style="font-size: 1.5rem; color: var(--secondary-color);"></i>
+                            </label>
+                            
+                            <label style="display: flex; align-items: center; gap: 15px; padding: 20px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md); cursor: pointer;">
+                                <input type="radio" name="paymentMethod" value="net_banking" style="width: auto;">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: var(--dark);">Net Banking</div>
+                                    <div style="font-size: 0.85rem; color: var(--gray);">All major banks supported</div>
+                                </div>
+                                <i class="fas fa-university" style="font-size: 1.5rem; color: var(--secondary-color);"></i>
+                            </label>
+                        </div>
+
+                        <div id="cardFields">
+                            <div class="form-group">
+                                <label>Card Number</label>
+                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label>Expiry Date</label>
+                                    <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="form-group">
+                                    <label>CVV</label>
+                                    <input type="password" id="cardCvv" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Cardholder Name</label>
+                                <input type="text" id="cardName" placeholder="Name on card">
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="processPayment()" class="btn btn-primary btn-full" id="payBtn" style="margin-top: 25px; padding: 16px;">
+                            <i class="fas fa-lock"></i>
+                            Pay Securely
+                        </button>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; color: var(--gray); font-size: 0.9rem;">
+                        <span><i class="fas fa-shield-alt" style="color: var(--success-color);"></i> SSL Secured</span>
+                        <span><i class="fas fa-lock" style="color: var(--success-color);"></i> 256-bit Encryption</span>
+                    </div>
+                </div>
+
+                <!-- Booking Summary -->
+                <div>
+                    <div style="background: var(--white); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow-md); position: sticky; top: 100px;">
+                        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 25px; color: var(--dark);">Booking Summary</h3>
+                        
+                        <div id="bookingSummary">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 25px; padding-top: 25px; border-top: 2px solid var(--gray-lighter);">
+                            <div style="display: flex; align-items: center; gap: 15px; color: var(--gray); font-size: 0.9rem;">
+                                <i class="fas fa-info-circle"></i>
+                                <span>By confirming, you agree to our <a href="#" style="color: var(--primary-color);">Terms of Service</a> and <a href="#" style="color: var(--primary-color);">Cancellation Policy</a>.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 60px;">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="logo" style="color: white;">
+                    <div class="logo-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    Tour<span>Book</span>
+                </a>
+                <p>Your trusted partner for discovering and booking amazing travel experiences.</p>
+            </div>
+            <div class="footer-links">
+                <h4>For Travelers</h4>
+                <ul>
+                    <li><a href="tours.html">Browse Tours</a></li>
+                    <li><a href="wishlist.html">My Wishlist</a></li>
+                    <li><a href="bookings.html">My Bookings</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>For Agents</h4>
+                <ul>
+                    <li><a href="register.html?role=agent">Become an Agent</a></li>
+                    <li><a href="agent-dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TourBook. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+
+        // Get booking ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('booking');
+
+        if (!bookingId) {
+            window.location.href = 'bookings.html';
+        }
+
+        let currentBooking = null;
+
+        // Load booking details
+        async function loadBooking() {
+            try {
+                const response = await fetch(`/api/bookings/${bookingId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load booking');
+                }
+                
+                currentBooking = data.booking;
+                
+                // Check if already paid
+                if (currentBooking.booking_status === 'confirmed' || currentBooking.booking_status === 'completed') {
+                    document.getElementById('paymentAlert').innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> This booking has already been paid.</div>';
+                    document.getElementById('payBtn').disabled = true;
+                }
+                
+                renderSummary();
+            } catch (error) {
+                document.getElementById('bookingSummary').innerHTML = `
+                    <div class="alert alert-error">${error.message}</div>
+                `;
+            }
+        }
+
+        // Render booking summary
+        function renderSummary() {
+            const summary = document.getElementById('bookingSummary');
+            
+            summary.innerHTML = `
+                <div style="display: flex; gap: 15px; margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid var(--gray-lighter);">
+                    <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=120&h=120&fit=crop" style="width: 80px; height: 80px; border-radius: var(--radius-md); object-fit: cover;">
+                    <div>
+                        <h4 style="font-weight: 600; color: var(--dark); margin-bottom: 5px;">${currentBooking.tour_title}</h4>
+                        <p style="font-size: 0.9rem; color: var(--gray); margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> ${currentBooking.tour_location}</p>
+                        <p style="font-size: 0.9rem; color: var(--gray);"><i class="fas fa-users"></i> ${currentBooking.seats_booked} traveler${currentBooking.seats_booked > 1 ? 's' : ''}</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                        <span style="color: var(--gray);">Price per person</span>
+                        <span style="font-weight: 500;">$${(currentBooking.total_amount / currentBooking.seats_booked).toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                        <span style="color: var(--gray);">Travelers</span>
+                        <span style="font-weight: 500;">${currentBooking.seats_booked}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                        <span style="color: var(--gray);">Booking ID</span>
+                        <span style="font-family: monospace;">${currentBooking.uuid.substring(0, 8).toUpperCase()}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding-top: 15px; border-top: 2px solid var(--gray-lighter);">
+                        <span style="font-weight: 700; color: var(--dark); font-size: 1.1rem;">Total Amount</span>
+                        <span style="font-weight: 700; color: var(--primary-color); font-size: 1.5rem;">$${currentBooking.total_amount}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Process payment
+        async function processPayment() {
+            const payBtn = document.getElementById('payBtn');
+            const alertDiv = document.getElementById('paymentAlert');
+            
+            // Get selected payment method
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'card';
+            
+            payBtn.disabled = true;
+            payBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; display: inline-block; vertical-align: middle; margin-right: 10px;"></div> Processing...';
+            
+            try {
+                const response = await fetch('/api/payments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        booking_id: bookingId,
+                        payment_method: paymentMethod
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alertDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            Payment successful! Transaction ID: ${data.payment.transaction_id}
+                        </div>
+                    `;
+                    
+                    setTimeout(() => {
+                        window.location.href = `bookings.html?success=true`;
+                    }, 2000);
+                } else {
+                    alertDiv.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${data.error || 'Payment failed'}</div>`;
+                    payBtn.disabled = false;
+                    payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay Securely';
+                }
+            } catch (error) {
+                alertDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Network error. Please try again.</div>';
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay Securely';
+            }
+        }
+
+        // Initialize
+        loadBooking();
+        updateNavigation();
+    </script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Details - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="tour-details-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                Tour<span>Book</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="tours.html" class="active">Tours</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-buttons" id="navAuthButtons">
+                <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+                <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Tour Hero -->
+    <div class="tour-hero" id="tourHero">
+        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&h=600&fit=crop" alt="Tour" id="tourHeroImage">
+        <div class="tour-hero-overlay">
+            <div class="tour-hero-content">
+                <span class="tour-badge" id="tourType">Adventure</span>
+                <h1 id="tourTitle">Loading...</h1>
+                <div class="tour-hero-meta">
+                    <span><i class="fas fa-map-marker-alt"></i> <span id="tourLocation">...</span></span>
+                    <span><i class="fas fa-clock"></i> <span id="tourDuration">...</span></span>
+                    <span><i class="fas fa-star"></i> <span id="tourRating">...</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tour Content -->
+    <div class="tour-details-content">
+        <div class="tour-info">
+            <h2>About This Tour</h2>
+            <p id="tourDescription">Loading tour details...</p>
+
+            <div class="tour-info-features">
+                <div class="tour-info-feature">
+                    <i class="fas fa-calendar-alt"></i>
+                    <div>
+                        <h4>Tour Date</h4>
+                        <p id="tourDate">...</p>
+                    </div>
+                </div>
+                <div class="tour-info-feature">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <h4>Group Size</h4>
+                        <p id="tourSlots">...</p>
+                    </div>
+                </div>
+                <div class="tour-info-feature">
+                    <i class="fas fa-user-tie"></i>
+                    <div>
+                        <h4>Tour Agent</h4>
+                        <p id="tourAgent">...</p>
+                    </div>
+                </div>
+                <div class="tour-info-feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <h4>Cancellation</h4>
+                        <p>Free cancellation 24h before</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Reviews</h2>
+            <div id="reviewsSection">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tour-sidebar">
+            <div class="booking-card">
+                <h3>Book This Tour</h3>
+                <div class="booking-price">
+                    <span class="currency">$</span>
+                    <span class="amount" id="bookingPrice">0</span>
+                    <span class="unit">/person</span>
+                </div>
+
+                <div id="bookingAlert"></div>
+
+                <form id="bookingForm">
+                    <div class="booking-form-group">
+                        <label for="bookingDate">Select Date</label>
+                        <input type="date" id="bookingDate" required>
+                    </div>
+
+                    <div class="booking-form-group">
+                        <label for="numTravelers">Number of Travelers</label>
+                        <select id="numTravelers" required onchange="updateBookingSummary()">
+                            <option value="1">1 Person</option>
+                            <option value="2">2 People</option>
+                            <option value="3">3 People</option>
+                            <option value="4">4 People</option>
+                            <option value="5">5 People</option>
+                        </select>
+                    </div>
+
+                    <div class="booking-summary">
+                        <div class="booking-summary-row">
+                            <span>Price per person</span>
+                            <span id="summaryPrice">$0</span>
+                        </div>
+                        <div class="booking-summary-row">
+                            <span>Number of travelers</span>
+                            <span id="summaryTravelers">1</span>
+                        </div>
+                        <div class="booking-summary-row total">
+                            <span>Total</span>
+                            <span id="summaryTotal">$0</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="bookBtn">
+                        <i class="fas fa-calendar-check"></i>
+                        Book Now
+                    </button>
+                </form>
+
+                <p style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--gray);">
+                    <i class="fas fa-lock"></i> Secure payment processing
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="logo" style="color: white;">
+                    <div class="logo-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    Tour<span>Book</span>
+                </a>
+                <p>Your trusted partner for discovering and booking amazing travel experiences.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>For Travelers</h4>
+                <ul>
+                    <li><a href="tours.html">Browse Tours</a></li>
+                    <li><a href="wishlist.html">My Wishlist</a></li>
+                    <li><a href="bookings.html">My Bookings</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>For Agents</h4>
+                <ul>
+                    <li><a href="register.html?role=agent">Become an Agent</a></li>
+                    <li><a href="agent-dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TourBook. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        let currentTour = null;
+        let tourPrice = 0;
+
+        // Get tour ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tourId = urlParams.get('id');
+
+        if (!tourId) {
+            window.location.href = 'tours.html';
+        }
+
+        // Load tour details
+        async function loadTourDetails() {
+            try {
+                const response = await fetch(`/api/tours/${tourId}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    window.location.href = 'tours.html';
+                    return;
+                }
+
+                currentTour = data.tour;
+                tourPrice = currentTour.price_per_person;
+
+                // Update page content
+                document.getElementById('tourHeroImage').src = currentTour.image_url || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&h=600&fit=crop';
+                document.getElementById('tourType').textContent = currentTour.tour_type || 'Tour';
+                document.getElementById('tourTitle').textContent = currentTour.title;
+                document.getElementById('tourLocation').textContent = currentTour.location;
+                document.getElementById('tourDuration').textContent = `${currentTour.duration_days} days`;
+                document.getElementById('tourRating').textContent = `${currentTour.avg_rating || '0.0'} (${currentTour.reviews?.length || 0} reviews)`;
+                document.getElementById('tourDescription').textContent = currentTour.description || 'No description available.';
+                document.getElementById('tourDate').textContent = new Date(currentTour.tour_date).toLocaleDateString('en-US', { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                });
+                document.getElementById('tourSlots').textContent = `${currentTour.available_slots} of ${currentTour.total_slots} slots available`;
+                document.getElementById('tourAgent').textContent = currentTour.agent_name || 'Unknown Agent';
+                document.getElementById('bookingPrice').textContent = tourPrice;
+
+                // Set min date for booking
+                document.getElementById('bookingDate').min = new Date().toISOString().split('T')[0];
+
+                // Update booking summary
+                updateBookingSummary();
+
+                // Render reviews
+                renderReviews(currentTour.reviews || []);
+
+            } catch (error) {
+                document.getElementById('tourDescription').textContent = 'Failed to load tour details. Please try again.';
+            }
+        }
+
+        // Update booking summary
+        function updateBookingSummary() {
+            const travelers = parseInt(document.getElementById('numTravelers').value) || 1;
+            const total = tourPrice * travelers;
+
+            document.getElementById('summaryPrice').textContent = `$${tourPrice}`;
+            document.getElementById('summaryTravelers').textContent = travelers;
+            document.getElementById('summaryTotal').textContent = `$${total}`;
+        }
+
+        // Render reviews
+        function renderReviews(reviews) {
+            const container = document.getElementById('reviewsSection');
+            
+            if (reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 40px 20px;">
+                        <i class="fas fa-comment-slash"></i>
+                        <h3>No reviews yet</h3>
+                        <p>Be the first to review this tour after your experience!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = reviews.map(review => `
+                <div style="background: var(--white); border-radius: var(--radius-md); padding: 25px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 50px; height: 50px; background: var(--gradient-primary); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                ${review.user_name ? review.user_name.charAt(0).toUpperCase() : 'U'}
+                            </div>
+                            <div>
+                                <h4 style="font-weight: 600; color: var(--dark);">${review.user_name || 'Anonymous'}</h4>
+                                <p style="font-size: 0.85rem; color: var(--gray);">${new Date(review.created_at).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <div style="color: var(--accent-color); font-size: 1.2rem;">
+                            ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                        </div>
+                    </div>
+                    <p style="color: var(--gray-dark); line-height: 1.6;">${review.comment || 'No comment provided.'}</p>
+                </div>
+            `).join('');
+        }
+
+        // Handle booking form submission
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
+                return;
+            }
+
+            const bookBtn = document.getElementById('bookBtn');
+            const alertDiv = document.getElementById('bookingAlert');
+            const numTravelers = parseInt(document.getElementById('numTravelers').value);
+
+            // Check availability
+            if (numTravelers > currentTour.available_slots) {
+                alertDiv.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Only ${currentTour.available_slots} slots available</div>`;
+                return;
+            }
+
+            bookBtn.disabled = true;
+            bookBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> Processing...';
+
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        tour_id: tourId,
+                        seats: numTravelers
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Redirect to payment page
+                    window.location.href = `payment.html?booking=${data.booking.uuid}`;
+                } else {
+                    alertDiv.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${data.error || 'Booking failed'}</div>`;
+                    bookBtn.disabled = false;
+                    bookBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Book Now';
+                }
+            } catch (error) {
+                alertDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Network error. Please try again.</div>';
+                bookBtn.disabled = false;
+                bookBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Book Now';
+            }
+        });
+
+        // Load tour details
+        loadTourDetails();
+        updateNavigation();
+    </script>
+</body>
+</html>

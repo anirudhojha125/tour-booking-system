@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container" style="max-width: 550px;">
+            <div class="auth-logo">
+                <a href="index.html" class="logo" style="display: inline-flex;">
+                    <div class="logo-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                </a>
+                <h2>Create Account</h2>
+                <p>Join our community of travelers and agents</p>
+            </div>
+
+            <div id="registerAlert"></div>
+
+            <form id="registerForm">
+                <div class="role-selector">
+                    <div class="role-option" data-role="traveler" onclick="selectRole('traveler')">
+                        <i class="fas fa-user"></i>
+                        <h4>Traveler</h4>
+                        <p>Book tours & explore</p>
+                    </div>
+                    <div class="role-option" data-role="agent" onclick="selectRole('agent')">
+                        <i class="fas fa-store"></i>
+                        <h4>Tour Agent</h4>
+                        <p>List & manage tours</p>
+                    </div>
+                </div>
+                <input type="hidden" id="role" name="role" value="traveler">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" placeholder="John" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" placeholder="Doe" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 234 567 8900">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Create a strong password" required minlength="6">
+                    <small style="color: var(--gray); font-size: 0.8rem;">Must be at least 6 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 0.9rem; color: var(--gray-dark);">
+                        <input type="checkbox" id="terms" required style="width: auto; margin-top: 3px;">
+                        <span>I agree to the <a href="#" style="color: var(--primary-color);">Terms of Service</a> and <a href="#" style="color: var(--primary-color);">Privacy Policy</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="registerBtn">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+            </form>
+
+            <div class="form-footer">
+                <p>Already have an account? <a href="login.html">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Select role
+        function selectRole(role) {
+            document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`.role-option[data-role="${role}"]`).classList.add('selected');
+            document.getElementById('role').value = role;
+        }
+
+        // Check URL for role parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const roleParam = urlParams.get('role');
+        if (roleParam === 'agent') {
+            selectRole('agent');
+        } else {
+            selectRole('traveler');
+        }
+
+        // Register form handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('registerBtn');
+            const alertDiv = document.getElementById('registerAlert');
+            
+            // Validate passwords match
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alertDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Passwords do not match</div>';
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> Creating account...';
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        password: password,
+                        first_name: document.getElementById('firstName').value,
+                        last_name: document.getElementById('lastName').value,
+                        phone: document.getElementById('phone').value || null,
+                        role: document.getElementById('role').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alertDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Account created successfully! Redirecting to login...</div>';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    alertDiv.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${data.error || 'Registration failed'}</div>`;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+                }
+            } catch (error) {
+                alertDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Network error. Please try again.</div>';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+            }
+        });
+    </script>
+</body>
+</html>

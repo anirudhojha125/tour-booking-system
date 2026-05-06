@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                Tour<span>Book</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="tours.html">Tours</a></li>
+                <li><a href="admin-dashboard.html" class="active">Admin</a></li>
+            </ul>
+            <div class="nav-buttons" id="navAuthButtons">
+                <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p style="color: var(--gray);">Platform overview and management</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAddAdminModal()">
+                <i class="fas fa-user-plus"></i>
+                Add Admin
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-card-icon blue">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statUsers">0</h3>
+                <p>Total Users</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon green">
+                <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statTours">0</h3>
+                <p>Active Tours</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon orange">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statBookings">0</h3>
+                <p>Total Bookings</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon purple">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statRevenue">$0</h3>
+                <p>Total Revenue</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <div class="dashboard-tabs">
+            <button class="dashboard-tab active" onclick="switchTab('overview')">Overview</button>
+            <button class="dashboard-tab" onclick="switchTab('users')">Users</button>
+            <button class="dashboard-tab" onclick="switchTab('tours')">Tours</button>
+            <button class="dashboard-tab" onclick="switchTab('bookings')">Bookings</button>
+            <button class="dashboard-tab" onclick="switchTab('payments')">Payments</button>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overviewSection" class="dashboard-section">
+            <h2 style="margin-bottom: 30px;">Platform Overview</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <div style="background: var(--light); border-radius: var(--radius-md); padding: 25px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: var(--dark);">User Distribution</h3>
+                    <div id="userDistribution">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+                <div style="background: var(--light); border-radius: var(--radius-md); padding: 25px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: var(--dark);">Booking Status</h3>
+                    <div id="bookingStatus">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+                <div style="background: var(--light); border-radius: var(--radius-md); padding: 25px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: var(--dark);">Payment Methods</h3>
+                    <div id="paymentMethods">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="usersSection" class="dashboard-section hidden">
+            <div class="section-header-row">
+                <h2>All Users</h2>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="userSearch" placeholder="Search users..." 
+                        style="padding: 8px 15px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md);">
+                    <select id="userRoleFilter" onchange="filterUsers()" style="padding: 8px 15px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md);">
+                        <option value="">All Roles</option>
+                        <option value="traveler">Traveler</option>
+                        <option value="agent">Agent</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+            <div id="usersTableContainer">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tours Section -->
+        <div id="toursSection" class="dashboard-section hidden">
+            <div class="section-header-row">
+                <h2>All Tours</h2>
+                <select id="adminTourStatusFilter" onchange="filterAdminTours()" style="padding: 8px 15px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md);">
+                    <option value="">All Status</option>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+            <div id="adminToursTableContainer">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tour</th>
+                            <th>Agent</th>
+                            <th>Location</th>
+                            <th>Price</th>
+                            <th>Slots</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminToursTableBody">
+                        <!-- Tours loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bookings Section -->
+        <div id="bookingsSection" class="dashboard-section hidden">
+            <div class="section-header-row">
+                <h2>All Bookings</h2>
+                <select id="adminBookingStatusFilter" onchange="filterAdminBookings()" style="padding: 8px 15px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md);">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div id="adminBookingsTableContainer">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tour</th>
+                            <th>Traveler</th>
+                            <th>Seats</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminBookingsTableBody">
+                        <!-- Bookings loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Payments Section -->
+        <div id="paymentsSection" class="dashboard-section hidden">
+            <div class="section-header-row">
+                <h2>Payment Records</h2>
+            </div>
+            <div id="paymentsTableContainer">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Booking</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        <!-- Payments loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Admin Modal -->
+    <div class="modal-overlay" id="addAdminModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-shield"></i> Add Admin User</h3>
+                <button class="modal-close" onclick="closeAddAdminModal()">&times;</button>
+            </div>
+            <form id="addAdminForm">
+                <div class="modal-body">
+                    <div id="addAdminAlert"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" id="adminFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" id="adminLastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="adminEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="adminPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" id="adminPassword" required minlength="6">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeAddAdminModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveAdminBtn">
+                        <i class="fas fa-save"></i>
+                        Create Admin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        let dashboardData = {};
+        let allUsers = [];
+        let allTours = [];
+        let allBookings = [];
+        let allPayments = [];
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                // Load stats
+                const statsRes = await fetch('/api/admin/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                dashboardData = await statsRes.json();
+
+                // Update stats
+                document.getElementById('statUsers').textContent = dashboardData.users?.total_users || 0;
+                document.getElementById('statTours').textContent = dashboardData.tours?.active_tours || 0;
+                document.getElementById('statBookings').textContent = dashboardData.bookings?.total || 0;
+                document.getElementById('statRevenue').textContent = `$${(dashboardData.payments?.total_collected || 0).toFixed(0)}`;
+
+                // Load detailed data
+                const [usersRes, toursRes, bookingsRes, paymentsRes] = await Promise.all([
+                    fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/admin/tours', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/admin/bookings', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/payments', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+
+                const usersData = await usersRes.json();
+                const toursData = await toursRes.json();
+                const bookingsData = await bookingsRes.json();
+                const paymentsData = await paymentsRes.json();
+
+                allUsers = usersData.users || [];
+                allTours = toursData.tours || [];
+                allBookings = bookingsData.bookings || [];
+                allPayments = paymentsData.payments || [];
+
+                renderOverview();
+                renderUsers();
+                renderAdminTours();
+                renderAdminBookings();
+                renderPayments();
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+
+        // Render overview charts
+        function renderOverview() {
+            // User distribution
+            const userDist = dashboardData.users || {};
+            document.getElementById('userDistribution').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 20px; height: 20px; background: var(--primary-color); border-radius: var(--radius-sm);"></div>
+                        <span style="flex: 1;">Travelers</span>
+                        <span style="font-weight: 600;">${userDist.travelers || 0}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 20px; height: 20px; background: var(--secondary-color); border-radius: var(--radius-sm);"></div>
+                        <span style="flex: 1;">Agents</span>
+                        <span style="font-weight: 600;">${userDist.agents || 0}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 20px; height: 20px; background: var(--accent-color); border-radius: var(--radius-sm);"></div>
+                        <span style="flex: 1;">Admins</span>
+                        <span style="font-weight: 600;">${userDist.admins || 0}</span>
+                    </div>
+                </div>
+            `;
+
+            // Booking status
+            const bookingStats = dashboardData.bookings || {};
+            document.getElementById('bookingStatus').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 20px; height: 20px; background: var(--warning-color); border-radius: var(--radius-sm);"></div>
+                        <span style="flex: 1;">Pending</span>
+                        <span style="font-weight: 600;">${bookingStats.pending || 0}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 20px; height: 20px; background: var(--success-color); border-radius: var(--radius-sm);"></div>
+                        <span style="flex: 1;">Confirmed</span>
+                        <span style="font-weight: 600;">${bookingStats.confirmed || 0}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 20px; height: 20px; background: var(--info-color); border-radius: var(--radius-sm);"></div>
+                        <span style="flex: 1;">Completed</span>
+                        <span style="font-weight: 600;">${bookingStats.completed || 0}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 20px; height: 20px; background: var(--error-color); border-radius: var(--radius-sm);"></div>
+                        <span style="flex: 1;">Cancelled</span>
+                        <span style="font-weight: 600;">${bookingStats.cancelled || 0}</span>
+                    </div>
+                </div>
+            `;
+
+            // Payment methods
+            const paymentStats = dashboardData.payments?.by_method || [];
+            document.getElementById('paymentMethods').innerHTML = paymentStats.length > 0 ?
+                paymentStats.map(m => `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                        <div style="flex: 1;">${m.method.toUpperCase()}</div>
+                        <span style="font-weight: 600;">$${m.total.toFixed(0)}</span>
+                    </div>
+                `).join('') :
+                '<p style="color: var(--gray);">No payment data available</p>';
+        }
+
+        // Render users table
+        function renderUsers() {
+            const roleFilter = document.getElementById('userRoleFilter').value;
+            const search = document.getElementById('userSearch').value.toLowerCase();
+            
+            let users = allUsers;
+            if (roleFilter) users = users.filter(u => u.role === roleFilter);
+            if (search) users = users.filter(u => 
+                u.email.toLowerCase().includes(search) || 
+                u.first_name.toLowerCase().includes(search) || 
+                u.last_name.toLowerCase().includes(search)
+            );
+
+            const tbody = document.getElementById('usersTableBody');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No users found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: var(--gradient-primary); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                ${user.first_name.charAt(0)}${user.last_name.charAt(0)}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">${user.first_name} ${user.last_name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.email}</td>
+                    <td><span class="badge badge-${getRoleColor(user.role)}">${user.role}</span></td>
+                    <td><span class="badge badge-${user.is_active ? 'success' : 'error'}">${user.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-sm ${user.is_active ? 'btn-outline' : 'btn-primary'}" onclick="toggleUserStatus('${user.uuid}', ${!user.is_active})">
+                                ${user.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Render tours table
+        function renderAdminTours() {
+            const statusFilter = document.getElementById('adminTourStatusFilter').value;
+            let tours = allTours;
+            
+            if (statusFilter !== '') {
+                const isActive = statusFilter === 'true';
+                tours = tours.filter(t => t.is_active === isActive);
+            }
+
+            const tbody = document.getElementById('adminToursTableBody');
+            if (tours.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No tours found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = tours.map(tour => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img src="${tour.image_url || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=50&h=50&fit=crop'}" style="width: 45px; height: 45px; border-radius: var(--radius-sm); object-fit: cover;">
+                            <div>
+                                <div style="font-weight: 600;">${tour.title}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${tour.agent_name || 'Unknown'}</td>
+                    <td>${tour.location}</td>
+                    <td>$${tour.price_per_person}</td>
+                    <td>${tour.available_slots}/${tour.total_slots}</td>
+                    <td><span class="badge ${tour.is_active ? 'badge-success' : 'badge-error'}">${tour.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <button class="btn btn-sm" style="background: ${tour.is_active ? 'var(--error-color)' : 'var(--success-color)'}; color: white;" onclick="toggleAdminTourStatus('${tour.uuid}', ${!tour.is_active})">
+                            ${tour.is_active ? 'Deactivate' : 'Activate'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Render bookings table
+        function renderAdminBookings() {
+            const statusFilter = document.getElementById('adminBookingStatusFilter').value;
+            let bookings = allBookings;
+            if (statusFilter) bookings = bookings.filter(b => b.booking_status === statusFilter);
+
+            const tbody = document.getElementById('adminBookingsTableBody');
+            if (bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No bookings found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = bookings.map(booking => `
+                <tr>
+                    <td><code>${booking.uuid.substring(0, 8)}</code></td>
+                    <td>${booking.tour_title}</td>
+                    <td>${booking.traveler_name}</td>
+                    <td>${booking.seats_booked}</td>
+                    <td>$${booking.total_amount}</td>
+                    <td><span class="badge badge-${getStatusColor(booking.booking_status)}">${booking.booking_status}</span></td>
+                    <td>${new Date(booking.booking_date).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Render payments table
+        function renderPayments() {
+            const tbody = document.getElementById('paymentsTableBody');
+            if (allPayments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No payments found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allPayments.map(payment => `
+                <tr>
+                    <td><code>${payment.transaction_id || 'N/A'}</code></td>
+                    <td><code>${payment.booking_id}</code></td>
+                    <td>$${payment.amount}</td>
+                    <td>${payment.payment_method.toUpperCase()}</td>
+                    <td><span class="badge badge-${getPaymentStatusColor(payment.payment_status)}">${payment.payment_status}</span></td>
+                    <td>${payment.paid_at ? new Date(payment.paid_at).toLocaleDateString() : '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Helper functions
+        function getRoleColor(role) {
+            switch(role) {
+                case 'admin': return 'error';
+                case 'agent': return 'info';
+                case 'traveler': return 'success';
+                default: return '';
+            }
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'confirmed': return 'success';
+                case 'pending': return 'warning';
+                case 'completed': return 'info';
+                case 'cancelled': return 'error';
+                default: return '';
+            }
+        }
+
+        function getPaymentStatusColor(status) {
+            switch(status) {
+                case 'success': return 'success';
+                case 'pending': return 'warning';
+                case 'failed': return 'error';
+                case 'refunded': return 'info';
+                default: return '';
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            ['overview', 'users', 'tours', 'bookings', 'payments'].forEach(t => {
+                document.getElementById(t + 'Section').classList.toggle('hidden', t !== tab);
+            });
+        }
+
+        // Modal functions
+        function openAddAdminModal() {
+            document.getElementById('addAdminModal').classList.add('active');
+        }
+
+        function closeAddAdminModal() {
+            document.getElementById('addAdminModal').classList.remove('active');
+            document.getElementById('addAdminForm').reset();
+            document.getElementById('addAdminAlert').innerHTML = '';
+        }
+
+        // Add admin
+        document.getElementById('addAdminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveAdminBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width: 18px; height: 18px; border-width: 2px;"></div> Creating...';
+
+            try {
+                const response = await fetch('/api/admin/create-admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById('adminEmail').value,
+                        password: document.getElementById('adminPassword').value,
+                        first_name: document.getElementById('adminFirstName').value,
+                        last_name: document.getElementById('adminLastName').value,
+                        phone: document.getElementById('adminPhone').value || null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    closeAddAdminModal();
+                    loadDashboard();
+                    alert('Admin user created successfully!');
+                } else {
+                    document.getElementById('addAdminAlert').innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('addAdminAlert').innerHTML = '<div class="alert alert-error">Failed to create admin</div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Create Admin';
+            }
+        });
+
+        // Toggle user status
+        async function toggleUserStatus(userId, activate) {
+            if (!confirm(`Are you sure you want to ${activate ? 'activate' : 'deactivate'} this user?`)) return;
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ is_active: activate })
+                });
+
+                if (response.ok) {
+                    loadDashboard();
+                } else {
+                    alert('Failed to update user status');
+                }
+            } catch (error) {
+                alert('Network error');
+            }
+        }
+
+        // Toggle tour status
+        async function toggleAdminTourStatus(tourId, activate) {
+            if (!confirm(`Are you sure you want to ${activate ? 'activate' : 'deactivate'} this tour?`)) return;
+
+            try {
+                const response = await fetch(`/api/tours/${tourId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ is_active: activate })
+                });
+
+                if (response.ok) {
+                    loadDashboard();
+                } else {
+                    alert('Failed to update tour status');
+                }
+            } catch (error) {
+                alert('Network error');
+            }
+        }
+
+        // Filter functions
+        function filterUsers() {
+            renderUsers();
+        }
+
+        function filterAdminTours() {
+            renderAdminTours();
+        }
+
+        function filterAdminBookings() {
+            renderAdminBookings();
+        }
+
+        // Search input handler
+        document.getElementById('userSearch')?.addEventListener('input', renderUsers);
+
+        // Initialize
+        loadDashboard();
+        updateNavigation();
+    </script>
+</body>
+</html>

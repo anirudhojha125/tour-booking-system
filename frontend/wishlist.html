@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="padding-top: 90px;">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                Tour<span>Book</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="tours.html">Tours</a></li>
+                <li><a href="wishlist.html" class="active">Wishlist</a></li>
+                <li><a href="bookings.html">Bookings</a></li>
+            </ul>
+            <div class="nav-buttons" id="navAuthButtons">
+                <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+                <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="section" style="padding-bottom: 30px;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 5%;">
+            <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--dark); margin-bottom: 10px;">My Wishlist</h1>
+            <p style="color: var(--gray); font-size: 1.1rem;">Save your favorite tours for later</p>
+        </div>
+    </section>
+
+    <!-- Wishlist Content -->
+    <section class="section" style="padding-top: 0;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 5%;">
+            <div id="wishlistContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="logo" style="color: white;">
+                    <div class="logo-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    Tour<span>Book</span>
+                </a>
+                <p>Your trusted partner for discovering and booking amazing travel experiences.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>For Travelers</h4>
+                <ul>
+                    <li><a href="tours.html">Browse Tours</a></li>
+                    <li><a href="wishlist.html">My Wishlist</a></li>
+                    <li><a href="bookings.html">My Bookings</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>For Agents</h4>
+                <ul>
+                    <li><a href="register.html?role=agent">Become an Agent</a></li>
+                    <li><a href="agent-dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TourBook. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+
+        // Load wishlist
+        async function loadWishlist() {
+            try {
+                const response = await fetch('/api/wishlist', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load wishlist');
+                }
+                
+                renderWishlist(data.wishlist || []);
+            } catch (error) {
+                document.getElementById('wishlistContent').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error loading wishlist</h3>
+                        <p>${error.message}</p>
+                        <button onclick="loadWishlist()" class="btn btn-primary">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Render wishlist
+        function renderWishlist(wishlist) {
+            const container = document.getElementById('wishlistContent');
+            
+            if (wishlist.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heart" style="color: var(--gray-light);"></i>
+                        <h3>Your wishlist is empty</h3>
+                        <p>Start exploring and save tours you love!</p>
+                        <a href="tours.html" class="btn btn-primary">Explore Tours</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <p style="color: var(--gray);">${wishlist.length} tour${wishlist.length !== 1 ? 's' : ''} saved</p>
+                    <button onclick="clearWishlist()" class="btn btn-outline btn-sm" style="color: var(--error-color); border-color: var(--error-color);">
+                        <i class="fas fa-trash"></i>
+                        Clear All
+                    </button>
+                </div>
+                <div class="tours-grid">
+                    ${wishlist.map(item => `
+                        <div class="tour-card">
+                            <div class="tour-image">
+                                <img src="${item.tour?.image_url || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&h=300&fit=crop'}" alt="${item.tour?.title || 'Tour'}">
+                                <span class="tour-badge">${item.tour?.tour_type || 'Tour'}</span>
+                                <button class="tour-wishlist active" onclick="removeFromWishlist('${item.tour?.uuid}', this)" title="Remove from wishlist">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="tour-content">
+                                <div class="tour-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    ${item.tour?.location || 'Unknown'}
+                                </div>
+                                <h3 class="tour-title">${item.tour?.title || 'Untitled Tour'}</h3>
+                                <div class="tour-meta">
+                                    <div class="tour-meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        ${item.tour?.duration_days || 0} days
+                                    </div>
+                                    <div class="tour-meta-item">
+                                        <i class="fas fa-users"></i>
+                                        ${item.tour?.available_slots || 0} slots left
+                                    </div>
+                                </div>
+                                <div class="tour-rating">
+                                    <span class="stars">${'★'.repeat(Math.round(item.tour?.avg_rating || 0))}${'☆'.repeat(5 - Math.round(item.tour?.avg_rating || 0))}</span>
+                                    <span>(${item.tour?.avg_rating || '0.0'})</span>
+                                </div>
+                                <div class="tour-footer">
+                                    <div class="tour-price">
+                                        <span class="label">From</span>
+                                        <span class="amount">$${item.tour?.price_per_person || 0}</span>
+                                    </div>
+                                    <a href="tour-details.html?id=${item.tour?.uuid}" class="btn btn-primary btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Remove from wishlist
+        async function removeFromWishlist(tourId, btn) {
+            try {
+                const response = await fetch(`/api/wishlist/${tourId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    btn.closest('.tour-card').remove();
+                    showToast('Removed from wishlist', 'info');
+                    
+                    // Check if wishlist is now empty
+                    const remaining = document.querySelectorAll('.tour-card');
+                    if (remaining.length === 0) {
+                        loadWishlist();
+                    }
+                }
+            } catch (error) {
+                showToast('Failed to remove from wishlist', 'error');
+            }
+        }
+
+        // Clear wishlist
+        async function clearWishlist() {
+            if (!confirm('Are you sure you want to clear your entire wishlist?')) return;
+            
+            try {
+                const response = await fetch('/api/wishlist/clear', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    showToast('Wishlist cleared', 'info');
+                    loadWishlist();
+                }
+            } catch (error) {
+                showToast('Failed to clear wishlist', 'error');
+            }
+        }
+
+        // Initialize
+        loadWishlist();
+        updateNavigation();
+    </script>
+</body>
+</html>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                Tour<span>Book</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="tours.html">Tours</a></li>
+                <li><a href="agent-dashboard.html" class="active">Dashboard</a></li>
+            </ul>
+            <div class="nav-buttons" id="navAuthButtons">
+                <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div>
+                <h1>Agent Dashboard</h1>
+                <p style="color: var(--gray);">Manage your tours and bookings</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAddTourModal()">
+                <i class="fas fa-plus"></i>
+                Add New Tour
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-card-icon blue">
+                <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statTours">0</h3>
+                <p>Active Tours</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon green">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statBookings">0</h3>
+                <p>Total Bookings</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon orange">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statRevenue">$0</h3>
+                <p>Total Revenue</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon purple">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statTravelers">0</h3>
+                <p>Travelers Served</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <div class="dashboard-tabs">
+            <button class="dashboard-tab active" onclick="switchTab('tours')">My Tours</button>
+            <button class="dashboard-tab" onclick="switchTab('bookings')">Bookings</button>
+        </div>
+
+        <!-- Tours Section -->
+        <div id="toursSection" class="dashboard-section">
+            <div class="section-header-row">
+                <h2>My Tours</h2>
+                <div style="display: flex; gap: 10px;">
+                    <select id="tourStatusFilter" onchange="filterTours()" style="padding: 8px 15px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md);">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div id="toursTableContainer">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tour</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Price</th>
+                            <th>Slots</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="toursTableBody">
+                        <!-- Tours loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bookings Section -->
+        <div id="bookingsSection" class="dashboard-section hidden">
+            <div class="section-header-row">
+                <h2>All Bookings</h2>
+                <select id="bookingStatusFilter" onchange="filterBookings()" style="padding: 8px 15px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md);">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div id="bookingsTableContainer">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Tour</th>
+                            <th>Traveler</th>
+                            <th>Seats</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTableBody">
+                        <!-- Bookings loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Tour Modal -->
+    <div class="modal-overlay" id="addTourModal">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Add New Tour</h3>
+                <button class="modal-close" onclick="closeAddTourModal()">&times;</button>
+            </div>
+            <form id="addTourForm">
+                <div class="modal-body">
+                    <div id="addTourAlert"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Tour Title *</label>
+                            <input type="text" id="tourTitle" required placeholder="e.g., Bali Adventure Tour">
+                        </div>
+                        <div class="form-group">
+                            <label>Location *</label>
+                            <input type="text" id="tourLocation" required placeholder="e.g., Bali, Indonesia">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="tourDescription" rows="3" placeholder="Describe the tour experience..."></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Tour Type *</label>
+                            <select id="tourType" required>
+                                <option value="adventure">Adventure</option>
+                                <option value="cultural">Cultural</option>
+                                <option value="nature">Nature</option>
+                                <option value="city">City</option>
+                                <option value="beach">Beach</option>
+                                <option value="wildlife">Wildlife</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (days) *</label>
+                            <input type="number" id="tourDuration" required min="1" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Slots *</label>
+                            <input type="number" id="tourSlots" required min="1" value="20">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Price per Person ($) *</label>
+                            <input type="number" id="tourPrice" required min="0" step="0.01" placeholder="199.99">
+                        </div>
+                        <div class="form-group">
+                            <label>Tour Date *</label>
+                            <input type="datetime-local" id="tourDate" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="url" id="tourImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeAddTourModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveTourBtn">
+                        <i class="fas fa-save"></i>
+                        Save Tour
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Tour Modal -->
+    <div class="modal-overlay" id="editTourModal">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Tour</h3>
+                <button class="modal-close" onclick="closeEditTourModal()">&times;</button>
+            </div>
+            <form id="editTourForm">
+                <input type="hidden" id="editTourId">
+                <div class="modal-body">
+                    <div id="editTourAlert"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Tour Title *</label>
+                            <input type="text" id="editTourTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Location *</label>
+                            <input type="text" id="editTourLocation" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="editTourDescription" rows="3"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Tour Type *</label>
+                            <select id="editTourType" required>
+                                <option value="adventure">Adventure</option>
+                                <option value="cultural">Cultural</option>
+                                <option value="nature">Nature</option>
+                                <option value="city">City</option>
+                                <option value="beach">Beach</option>
+                                <option value="wildlife">Wildlife</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (days) *</label>
+                            <input type="number" id="editTourDuration" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Slots *</label>
+                            <input type="number" id="editTourSlots" required min="1">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Price per Person ($) *</label>
+                            <input type="number" id="editTourPrice" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Tour Date *</label>
+                            <input type="datetime-local" id="editTourDate" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="url" id="editTourImage">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeEditTourModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="updateTourBtn">
+                        <i class="fas fa-save"></i>
+                        Update Tour
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'agent') {
+            window.location.href = 'login.html';
+        }
+
+        let allTours = [];
+        let allBookings = [];
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                // Load tours
+                const toursRes = await fetch('/api/tours/my-tours', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const toursData = await toursRes.json();
+                allTours = toursData.tours || [];
+
+                // Load bookings
+                const bookingsRes = await fetch('/api/bookings', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const bookingsData = await bookingsRes.json();
+                allBookings = bookingsData.bookings || [];
+
+                updateStats();
+                renderTours();
+                renderBookings();
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const activeTours = allTours.filter(t => t.is_active).length;
+            const totalRevenue = allBookings
+                .filter(b => ['confirmed', 'completed'].includes(b.booking_status))
+                .reduce((sum, b) => sum + b.total_amount, 0);
+            const totalTravelers = allBookings
+                .filter(b => ['confirmed', 'completed'].includes(b.booking_status))
+                .reduce((sum, b) => sum + b.seats_booked, 0);
+
+            document.getElementById('statTours').textContent = activeTours;
+            document.getElementById('statBookings').textContent = allBookings.length;
+            document.getElementById('statRevenue').textContent = `$${totalRevenue.toFixed(0)}`;
+            document.getElementById('statTravelers').textContent = totalTravelers;
+        }
+
+        // Render tours table
+        function renderTours() {
+            const statusFilter = document.getElementById('tourStatusFilter').value;
+            let tours = allTours;
+
+            if (statusFilter) {
+                tours = tours.filter(t => statusFilter === 'active' ? t.is_active : !t.is_active);
+            }
+
+            const tbody = document.getElementById('toursTableBody');
+            
+            if (tours.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No tours found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = tours.map(tour => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img src="${tour.image_url || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=60&h=60&fit=crop'}" 
+                                style="width: 50px; height: 50px; border-radius: var(--radius-sm); object-fit: cover;">
+                            <div>
+                                <div style="font-weight: 600;">${tour.title}</div>
+                                <div style="font-size: 0.85rem; color: var(--gray);">${tour.tour_type}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${tour.location}</td>
+                    <td>${new Date(tour.tour_date).toLocaleDateString()}</td>
+                    <td>$${tour.price_per_person}</td>
+                    <td>${tour.available_slots}/${tour.total_slots}</td>
+                    <td><span class="badge ${tour.is_active ? 'badge-success' : 'badge-error'}">${tour.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-sm btn-outline" onclick="editTour('${tour.uuid}')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline" onclick="viewTour('${tour.uuid}')" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm" style="background: ${tour.is_active ? 'var(--error-color)' : 'var(--success-color)'}; color: white;" 
+                                onclick="toggleTourStatus('${tour.uuid}', ${!tour.is_active})" title="${tour.is_active ? 'Deactivate' : 'Activate'}">
+                                <i class="fas fa-${tour.is_active ? 'times' : 'check'}"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Render bookings table
+        function renderBookings() {
+            const statusFilter = document.getElementById('bookingStatusFilter').value;
+            let bookings = allBookings;
+
+            if (statusFilter) {
+                bookings = bookings.filter(b => b.booking_status === statusFilter);
+            }
+
+            const tbody = document.getElementById('bookingsTableBody');
+            
+            if (bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No bookings found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = bookings.map(booking => `
+                <tr>
+                    <td><code>${booking.uuid.substring(0, 8)}</code></td>
+                    <td>${booking.tour_title}</td>
+                    <td>${booking.traveler_name}</td>
+                    <td>${booking.seats_booked}</td>
+                    <td>$${booking.total_amount}</td>
+                    <td><span class="badge badge-${getStatusColor(booking.booking_status)}">${booking.booking_status}</span></td>
+                    <td>${new Date(booking.booking_date).toLocaleDateString()}</td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            ${booking.booking_status === 'pending' ? `
+                                <button class="btn btn-sm btn-primary" onclick="confirmBooking('${booking.uuid}')">Confirm</button>
+                            ` : ''}
+                            ${booking.booking_status === 'confirmed' ? `
+                                <button class="btn btn-sm btn-secondary" onclick="completeBooking('${booking.uuid}')">Complete</button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Get status badge color
+        function getStatusColor(status) {
+            switch(status) {
+                case 'confirmed': return 'success';
+                case 'pending': return 'warning';
+                case 'completed': return 'info';
+                case 'cancelled': return 'error';
+                default: return '';
+            }
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tab === 'tours') {
+                document.getElementById('toursSection').classList.remove('hidden');
+                document.getElementById('bookingsSection').classList.add('hidden');
+            } else {
+                document.getElementById('toursSection').classList.add('hidden');
+                document.getElementById('bookingsSection').classList.remove('hidden');
+            }
+        }
+
+        // Modal functions
+        function openAddTourModal() {
+            document.getElementById('addTourModal').classList.add('active');
+            // Set minimum date to today
+            document.getElementById('tourDate').min = new Date().toISOString().slice(0, 16);
+        }
+
+        function closeAddTourModal() {
+            document.getElementById('addTourModal').classList.remove('active');
+            document.getElementById('addTourForm').reset();
+            document.getElementById('addTourAlert').innerHTML = '';
+        }
+
+        function closeEditTourModal() {
+            document.getElementById('editTourModal').classList.remove('active');
+            document.getElementById('editTourAlert').innerHTML = '';
+        }
+
+        // Add tour
+        document.getElementById('addTourForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveTourBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width: 18px; height: 18px; border-width: 2px;"></div> Saving...';
+
+            try {
+                const response = await fetch('/api/tours', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: document.getElementById('tourTitle').value,
+                        description: document.getElementById('tourDescription').value,
+                        location: document.getElementById('tourLocation').value,
+                        tour_type: document.getElementById('tourType').value,
+                        duration_days: parseInt(document.getElementById('tourDuration').value),
+                        total_slots: parseInt(document.getElementById('tourSlots').value),
+                        price_per_person: parseFloat(document.getElementById('tourPrice').value),
+                        tour_date: document.getElementById('tourDate').value,
+                        image_url: document.getElementById('tourImage').value || null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    closeAddTourModal();
+                    loadDashboard();
+                    alert('Tour created successfully!');
+                } else {
+                    document.getElementById('addTourAlert').innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('addTourAlert').innerHTML = '<div class="alert alert-error">Failed to create tour</div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Save Tour';
+            }
+        });
+
+        // Edit tour
+        function editTour(tourId) {
+            const tour = allTours.find(t => t.uuid === tourId);
+            if (!tour) return;
+
+            document.getElementById('editTourId').value = tourId;
+            document.getElementById('editTourTitle').value = tour.title;
+            document.getElementById('editTourLocation').value = tour.location;
+            document.getElementById('editTourDescription').value = tour.description || '';
+            document.getElementById('editTourType').value = tour.tour_type;
+            document.getElementById('editTourDuration').value = tour.duration_days;
+            document.getElementById('editTourSlots').value = tour.total_slots;
+            document.getElementById('editTourPrice').value = tour.price_per_person;
+            document.getElementById('editTourDate').value = tour.tour_date.slice(0, 16);
+            document.getElementById('editTourImage').value = tour.image_url || '';
+
+            document.getElementById('editTourModal').classList.add('active');
+        }
+
+        document.getElementById('editTourForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('updateTourBtn');
+            const tourId = document.getElementById('editTourId').value;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width: 18px; height: 18px; border-width: 2px;"></div> Updating...';
+
+            try {
+                const response = await fetch(`/api/tours/${tourId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: document.getElementById('editTourTitle').value,
+                        description: document.getElementById('editTourDescription').value,
+                        location: document.getElementById('editTourLocation').value,
+                        tour_type: document.getElementById('editTourType').value,
+                        duration_days: parseInt(document.getElementById('editTourDuration').value),
+                        total_slots: parseInt(document.getElementById('editTourSlots').value),
+                        price_per_person: parseFloat(document.getElementById('editTourPrice').value),
+                        tour_date: document.getElementById('editTourDate').value,
+                        image_url: document.getElementById('editTourImage').value || null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    closeEditTourModal();
+                    loadDashboard();
+                    alert('Tour updated successfully!');
+                } else {
+                    document.getElementById('editTourAlert').innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('editTourAlert').innerHTML = '<div class="alert alert-error">Failed to update tour</div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Update Tour';
+            }
+        });
+
+        // View tour
+        function viewTour(tourId) {
+            window.open(`tour-details.html?id=${tourId}`, '_blank');
+        }
+
+        // Toggle tour status
+        async function toggleTourStatus(tourId, activate) {
+            if (!confirm(`Are you sure you want to ${activate ? 'activate' : 'deactivate'} this tour?`)) return;
+
+            try {
+                const response = await fetch(`/api/tours/${tourId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ is_active: activate })
+                });
+
+                if (response.ok) {
+                    loadDashboard();
+                } else {
+                    alert('Failed to update tour status');
+                }
+            } catch (error) {
+                alert('Network error');
+            }
+        }
+
+        // Confirm booking
+        async function confirmBooking(bookingId) {
+            try {
+                const response = await fetch(`/api/bookings/${bookingId}/confirm`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    loadDashboard();
+                } else {
+                    alert('Failed to confirm booking');
+                }
+            } catch (error) {
+                alert('Network error');
+            }
+        }
+
+        // Complete booking
+        async function completeBooking(bookingId) {
+            try {
+                const response = await fetch(`/api/bookings/${bookingId}/complete`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    loadDashboard();
+                } else {
+                    alert('Failed to complete booking');
+                }
+            } catch (error) {
+                alert('Network error');
+            }
+        }
+
+        // Filter functions
+        function filterTours() {
+            renderTours();
+        }
+
+        function filterBookings() {
+            renderBookings();
+        }
+
+        // Initialize
+        loadDashboard();
+        updateNavigation();
+    </script>
+</body>
+</html>

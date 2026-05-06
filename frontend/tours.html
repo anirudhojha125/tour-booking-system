@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Tours - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                Tour<span>Book</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="tours.html" class="active">Tours</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-buttons" id="navAuthButtons">
+                <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+                <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section style="padding-top: 120px; padding-bottom: 40px; background: var(--gradient-secondary);">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 5%; text-align: center; color: white;">
+            <h1 style="font-size: 2.8rem; font-weight: 700; margin-bottom: 15px;">Explore Amazing Tours</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Discover handpicked tours from verified agents around the world</p>
+        </div>
+    </section>
+
+    <!-- Search & Filters -->
+    <section style="padding: 30px 5%; background: var(--white); border-bottom: 1px solid var(--gray-lighter);">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                <div style="flex: 1; min-width: 250px;">
+                    <div style="position: relative;">
+                        <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                        <input type="text" id="searchInput" placeholder="Search tours, destinations..." 
+                            style="width: 100%; padding: 14px 14px 14px 45px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md); font-size: 0.95rem;">
+                    </div>
+                </div>
+                <select id="typeFilter" style="padding: 14px 18px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md); font-size: 0.95rem; min-width: 150px;">
+                    <option value="">All Types</option>
+                    <option value="adventure">Adventure</option>
+                    <option value="cultural">Cultural</option>
+                    <option value="nature">Nature</option>
+                    <option value="city">City</option>
+                    <option value="beach">Beach</option>
+                    <option value="wildlife">Wildlife</option>
+                </select>
+                <select id="priceFilter" style="padding: 14px 18px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md); font-size: 0.95rem; min-width: 150px;">
+                    <option value="">Price Range</option>
+                    <option value="0-100">$0 - $100</option>
+                    <option value="100-500">$100 - $500</option>
+                    <option value="500-1000">$500 - $1000</option>
+                    <option value="1000+">$1000+</option>
+                </select>
+                <button onclick="applyFilters()" class="btn btn-primary">
+                    <i class="fas fa-filter"></i>
+                    Filter
+                </button>
+                <button onclick="resetFilters()" class="btn btn-outline">
+                    <i class="fas fa-undo"></i>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tours Grid -->
+    <section class="section">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">
+                    <span id="toursCount">0</span> Tours Available
+                </h2>
+                <select id="sortBy" onchange="sortTours()" style="padding: 10px 15px; border: 2px solid var(--gray-lighter); border-radius: var(--radius-md);">
+                    <option value="newest">Newest First</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                </select>
+            </div>
+
+            <div class="tours-grid" id="toursGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <div class="empty-state hidden" id="noResults">
+                <i class="fas fa-search"></i>
+                <h3>No tours found</h3>
+                <p>Try adjusting your search filters or browse all tours</p>
+                <button onclick="resetFilters()" class="btn btn-primary">View All Tours</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="logo" style="color: white;">
+                    <div class="logo-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    Tour<span>Book</span>
+                </a>
+                <p>Your trusted partner for discovering and booking amazing travel experiences.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>For Travelers</h4>
+                <ul>
+                    <li><a href="tours.html">Browse Tours</a></li>
+                    <li><a href="wishlist.html">My Wishlist</a></li>
+                    <li><a href="bookings.html">My Bookings</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>For Agents</h4>
+                <ul>
+                    <li><a href="register.html?role=agent">Become an Agent</a></li>
+                    <li><a href="agent-dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TourBook. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        let allTours = [];
+        let filteredTours = [];
+
+        // Load tours on page load
+        async function loadTours() {
+            try {
+                const response = await fetch('/api/tours');
+                const data = await response.json();
+                
+                allTours = data.tours || [];
+                filteredTours = [...allTours];
+                
+                renderTours();
+            } catch (error) {
+                document.getElementById('toursGrid').innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Failed to load tours</h3>
+                        <p>Please refresh the page to try again</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render tours grid
+        function renderTours() {
+            const grid = document.getElementById('toursGrid');
+            const countEl = document.getElementById('toursCount');
+            const noResults = document.getElementById('noResults');
+            
+            countEl.textContent = filteredTours.length;
+            
+            if (filteredTours.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            
+            noResults.classList.add('hidden');
+            
+            grid.innerHTML = filteredTours.map(tour => `
+                <div class="tour-card">
+                    <div class="tour-image">
+                        <img src="${tour.image_url || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&h=300&fit=crop'}" alt="${tour.title}">
+                        <span class="tour-badge">${tour.tour_type || 'Tour'}</span>
+                        ${getWishlistButton(tour.uuid)}
+                    </div>
+                    <div class="tour-content">
+                        <div class="tour-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${tour.location}
+                        </div>
+                        <h3 class="tour-title">${tour.title}</h3>
+                        <div class="tour-meta">
+                            <div class="tour-meta-item">
+                                <i class="fas fa-clock"></i>
+                                ${tour.duration_days} days
+                            </div>
+                            <div class="tour-meta-item">
+                                <i class="fas fa-users"></i>
+                                ${tour.available_slots} slots left
+                            </div>
+                        </div>
+                        <div class="tour-rating">
+                            <span class="stars">${'★'.repeat(Math.round(tour.avg_rating || 0))}${'☆'.repeat(5 - Math.round(tour.avg_rating || 0))}</span>
+                            <span>(${tour.avg_rating || '0.0'})</span>
+                        </div>
+                        <div class="tour-footer">
+                            <div class="tour-price">
+                                <span class="label">From</span>
+                                <span class="amount">$${tour.price_per_person}</span>
+                            </div>
+                            <a href="tour-details.html?id=${tour.uuid}" class="btn btn-primary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get wishlist button HTML
+        function getWishlistButton(tourId) {
+            const token = localStorage.getItem('token');
+            if (!token) return '';
+            
+            return `<button class="tour-wishlist" onclick="toggleWishlist('${tourId}', this)" title="Add to wishlist">
+                <i class="fas fa-heart"></i>
+            </button>`;
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const type = document.getElementById('typeFilter').value;
+            const priceRange = document.getElementById('priceFilter').value;
+            
+            filteredTours = allTours.filter(tour => {
+                // Search filter
+                if (search && !tour.title.toLowerCase().includes(search) && 
+                    !tour.location.toLowerCase().includes(search) &&
+                    !tour.description?.toLowerCase().includes(search)) {
+                    return false;
+                }
+                
+                // Type filter
+                if (type && tour.tour_type !== type) {
+                    return false;
+                }
+                
+                // Price filter
+                if (priceRange) {
+                    const price = tour.price_per_person;
+                    if (priceRange === '0-100' && (price < 0 || price > 100)) return false;
+                    if (priceRange === '100-500' && (price < 100 || price > 500)) return false;
+                    if (priceRange === '500-1000' && (price < 500 || price > 1000)) return false;
+                    if (priceRange === '1000+' && price < 1000) return false;
+                }
+                
+                return true;
+            });
+            
+            sortTours();
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('priceFilter').value = '';
+            document.getElementById('sortBy').value = 'newest';
+            
+            filteredTours = [...allTours];
+            renderTours();
+        }
+
+        // Sort tours
+        function sortTours() {
+            const sortBy = document.getElementById('sortBy').value;
+            
+            filteredTours.sort((a, b) => {
+                switch(sortBy) {
+                    case 'price-low':
+                        return a.price_per_person - b.price_per_person;
+                    case 'price-high':
+                        return b.price_per_person - a.price_per_person;
+                    case 'rating':
+                        return (b.avg_rating || 0) - (a.avg_rating || 0);
+                    case 'newest':
+                    default:
+                        return new Date(b.created_at) - new Date(a.created_at);
+                }
+            });
+            
+            renderTours();
+        }
+
+        // Toggle wishlist
+        async function toggleWishlist(tourId, btn) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/wishlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ tour_id: tourId })
+                });
+                
+                if (response.ok) {
+                    btn.classList.toggle('active');
+                    showToast('Added to wishlist!', 'success');
+                } else if (response.status === 409) {
+                    // Already in wishlist - remove it
+                    await fetch(`/api/wishlist/${tourId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    btn.classList.remove('active');
+                    showToast('Removed from wishlist', 'info');
+                }
+            } catch (error) {
+                showToast('Failed to update wishlist', 'error');
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type) {
+            // Simple alert for now - can be enhanced with a toast component
+            alert(message);
+        }
+
+        // Load tours when page loads
+        loadTours();
+        updateNavigation();
+    </script>
+</body>
+</html>

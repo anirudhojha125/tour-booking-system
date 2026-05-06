@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                Tour<span>Book</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="tours.html">Tours</a></li>
+                <li><a href="wishlist.html">Wishlist</a></li>
+                <li><a href="bookings.html" class="active">Bookings</a></li>
+            </ul>
+            <div class="nav-buttons" id="navAuthButtons">
+                <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+                <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div>
+                <h1>My Bookings</h1>
+                <p style="color: var(--gray);">View and manage your tour bookings</p>
+            </div>
+            <a href="tours.html" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+                Find More Tours
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-card-icon blue">
+                <i class="fas fa-calendar"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statTotal">0</h3>
+                <p>Total Bookings</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon orange">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statPending">0</h3>
+                <p>Pending</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon green">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statConfirmed">0</h3>
+                <p>Confirmed</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon purple">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-card-info">
+                <h3 id="statCompleted">0</h3>
+                <p>Completed</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings Content -->
+    <div class="dashboard-content">
+        <div class="dashboard-tabs">
+            <button class="dashboard-tab active" onclick="switchTab('all')">All Bookings</button>
+            <button class="dashboard-tab" onclick="switchTab('pending')">Pending</button>
+            <button class="dashboard-tab" onclick="switchTab('confirmed')">Confirmed</button>
+            <button class="dashboard-tab" onclick="switchTab('completed')">Completed</button>
+            <button class="dashboard-tab" onclick="switchTab('cancelled')">Cancelled</button>
+        </div>
+
+        <div class="dashboard-section">
+            <div id="bookingsContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-star"></i> Write a Review</h3>
+                <button class="modal-close" onclick="closeReviewModal()">&times;</button>
+            </div>
+            <form id="reviewForm">
+                <input type="hidden" id="reviewBookingId">
+                <div class="modal-body">
+                    <div id="reviewAlert"></div>
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <p style="margin-bottom: 15px; color: var(--gray-dark);">How was your experience?</p>
+                        <div id="starRating" style="font-size: 2rem; cursor: pointer;">
+                            <i class="far fa-star" data-rating="1"></i>
+                            <i class="far fa-star" data-rating="2"></i>
+                            <i class="far fa-star" data-rating="3"></i>
+                            <i class="far fa-star" data-rating="4"></i>
+                            <i class="far fa-star" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" id="ratingValue" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Review</label>
+                        <textarea id="reviewComment" rows="4" placeholder="Share your experience with this tour..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeReviewModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitReviewBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="logo" style="color: white;">
+                    <div class="logo-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    Tour<span>Book</span>
+                </a>
+                <p>Your trusted partner for discovering and booking amazing travel experiences.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>For Travelers</h4>
+                <ul>
+                    <li><a href="tours.html">Browse Tours</a></li>
+                    <li><a href="wishlist.html">My Wishlist</a></li>
+                    <li><a href="bookings.html">My Bookings</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>For Agents</h4>
+                <ul>
+                    <li><a href="register.html?role=agent">Become an Agent</a></li>
+                    <li><a href="agent-dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TourBook. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token || user.role !== 'traveler') {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+
+        let allBookings = [];
+        let currentTab = 'all';
+
+        // Load bookings
+        async function loadBookings() {
+            try {
+                const [bookingsRes, statsRes] = await Promise.all([
+                    fetch('/api/bookings', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/bookings/stats', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                
+                const bookingsData = await bookingsRes.json();
+                const statsData = await statsRes.json();
+                
+                allBookings = bookingsData.bookings || [];
+                
+                // Update stats
+                const stats = statsData.stats || {};
+                document.getElementById('statTotal').textContent = stats.total || 0;
+                document.getElementById('statPending').textContent = stats.pending || 0;
+                document.getElementById('statConfirmed').textContent = stats.confirmed || 0;
+                document.getElementById('statCompleted').textContent = stats.completed || 0;
+                
+                renderBookings();
+            } catch (error) {
+                document.getElementById('bookingsContent').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error loading bookings</h3>
+                        <button onclick="loadBookings()" class="btn btn-primary">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Render bookings
+        function renderBookings() {
+            const container = document.getElementById('bookingsContent');
+            
+            let bookings = allBookings;
+            if (currentTab !== 'all') {
+                bookings = bookings.filter(b => b.booking_status === currentTab);
+            }
+            
+            if (bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>No ${currentTab} bookings</h3>
+                        <p>${currentTab === 'all' ? 'Start exploring tours and make your first booking!' : `You don't have any ${currentTab} bookings.`}</p>
+                        ${currentTab === 'all' || currentTab === 'cancelled' ? '<a href="tours.html" class="btn btn-primary">Browse Tours</a>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tour</th>
+                            <th>Booking ID</th>
+                            <th>Seats</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${bookings.map(booking => `
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=60&h=60&fit=crop" style="width: 50px; height: 50px; border-radius: var(--radius-sm); object-fit: cover;">
+                                        <div>
+                                            <div style="font-weight: 600;">${booking.tour_title}</div>
+                                            <div style="font-size: 0.85rem; color: var(--gray);">${booking.tour_location}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><code>${booking.uuid.substring(0, 8).toUpperCase()}</code></td>
+                                <td>${booking.seats_booked}</td>
+                                <td style="font-weight: 600;">$${booking.total_amount}</td>
+                                <td><span class="badge badge-${getStatusColor(booking.booking_status)}">${booking.booking_status}</span></td>
+                                <td>${new Date(booking.booking_date).toLocaleDateString()}</td>
+                                <td>
+                                    <div style="display: flex; gap: 8px;">
+                                        ${booking.booking_status === 'pending' ? `
+                                            <a href="payment.html?booking=${booking.uuid}" class="btn btn-sm btn-primary">Pay Now</a>
+                                            <button onclick="cancelBooking('${booking.uuid}')" class="btn btn-sm btn-outline" style="color: var(--error-color);">Cancel</button>
+                                        ` : ''}
+                                        ${booking.booking_status === 'confirmed' ? `
+                                            <span style="font-size: 0.85rem; color: var(--gray);">Awaiting tour</span>
+                                        ` : ''}
+                                        ${booking.can_review ? `
+                                            <button onclick="openReviewModal('${booking.uuid}')" class="btn btn-sm btn-secondary">
+                                                <i class="fas fa-star"></i> Review
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Get status badge color
+        function getStatusColor(status) {
+            switch(status) {
+                case 'confirmed': return 'success';
+                case 'pending': return 'warning';
+                case 'completed': return 'info';
+                case 'cancelled': return 'error';
+                default: return '';
+            }
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderBookings();
+        }
+
+        // Cancel booking
+        async function cancelBooking(bookingId) {
+            if (!confirm('Are you sure you want to cancel this booking?')) return;
+            
+            try {
+                const response = await fetch(`/api/bookings/${bookingId}/cancel`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    showToast('Booking cancelled successfully', 'info');
+                    loadBookings();
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || 'Failed to cancel booking', 'error');
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            }
+        }
+
+        // Review modal
+        function openReviewModal(bookingId) {
+            document.getElementById('reviewBookingId').value = bookingId;
+            document.getElementById('reviewModal').classList.add('active');
+            document.getElementById('ratingValue').value = '';
+            document.getElementById('reviewComment').value = '';
+            updateStarDisplay(0);
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.remove('active');
+        }
+
+        // Star rating
+        document.getElementById('starRating')?.addEventListener('click', (e) => {
+            if (e.target.dataset.rating) {
+                const rating = parseInt(e.target.dataset.rating);
+                document.getElementById('ratingValue').value = rating;
+                updateStarDisplay(rating);
+            }
+        });
+
+        function updateStarDisplay(rating) {
+            const stars = document.querySelectorAll('#starRating i');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                    star.style.color = 'var(--accent-color)';
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                    star.style.color = 'var(--gray-light)';
+                }
+            });
+        }
+
+        // Submit review
+        document.getElementById('reviewForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const rating = document.getElementById('ratingValue').value;
+            if (!rating) {
+                document.getElementById('reviewAlert').innerHTML = '<div class="alert alert-error">Please select a rating</div>';
+                return;
+            }
+            
+            const btn = document.getElementById('submitReviewBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width: 18px; height: 18px; border-width: 2px;"></div> Submitting...';
+            
+            try {
+                const response = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        booking_id: document.getElementById('reviewBookingId').value,
+                        rating: parseInt(rating),
+                        comment: document.getElementById('reviewComment').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closeReviewModal();
+                    showToast('Review submitted successfully!', 'success');
+                    loadBookings();
+                } else {
+                    document.getElementById('reviewAlert').innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
+                }
+            } catch (error) {
+                document.getElementById('reviewAlert').innerHTML = '<div class="alert alert-error">Failed to submit review</div>';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
+            }
+        });
+
+        // Initialize
+        loadBookings();
+        updateNavigation();
+    </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - TourBook</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <a href="index.html" class="logo" style="display: inline-flex;">
+                    <div class="logo-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                </a>
+                <h2>Welcome Back!</h2>
+                <p>Sign in to continue your journey</p>
+            </div>
+
+            <div id="loginAlert"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; color: var(--gray-dark);">
+                        <input type="checkbox" id="rememberMe" style="width: auto;">
+                        Remember me
+                    </label>
+                    <a href="#" style="font-size: 0.9rem; color: var(--primary-color); text-decoration: none; font-weight: 500;">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="form-footer">
+                <p>Don't have an account? <a href="register.html">Sign up</a></p>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--gray-lighter);">
+                <p style="font-size: 0.85rem; color: var(--gray); margin-bottom: 15px;">Demo Accounts:</p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" onclick="fillDemo('traveler')" class="btn btn-outline btn-sm">
+                        Traveler
+                    </button>
+                    <button type="button" onclick="fillDemo('agent')" class="btn btn-outline btn-sm">
+                        Agent
+                    </button>
+                    <button type="button" onclick="fillDemo('admin')" class="btn btn-outline btn-sm">
+                        Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo account credentials
+        const demoAccounts = {
+            traveler: { email: 'traveler@demo.com', password: 'traveler123' },
+            agent: { email: 'agent@demo.com', password: 'agent123' },
+            admin: { email: 'admin@demo.com', password: 'admin123' }
+        };
+
+        function fillDemo(role) {
+            document.getElementById('email').value = demoAccounts[role].email;
+            document.getElementById('password').value = demoAccounts[role].password;
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('loginBtn');
+            const alertDiv = document.getElementById('loginAlert');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> Signing in...';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    alertDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Login successful! Redirecting...</div>';
+                    
+                    // Redirect based on role
+                    setTimeout(() => {
+                        if (data.user.role === 'admin') {
+                            window.location.href = 'admin-dashboard.html';
+                        } else if (data.user.role === 'agent') {
+                            window.location.href = 'agent-dashboard.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    }, 1000);
+                } else {
+                    alertDiv.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${data.error || 'Login failed'}</div>`;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                }
+            } catch (error) {
+                alertDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Network error. Please try again.</div>';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            }
+        });
+    </script>
+</body>
+</html>
