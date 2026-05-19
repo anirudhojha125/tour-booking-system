@@ -3,10 +3,13 @@ Tour Recommendation & Booking System - Flask Application
 """
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from config import Config
 from models import db
+from routes.auth import auth_bp
 from routes.tours import tours_bp
 from routes.bookings import bookings_bp
+from routes.payments import payments_bp
 from routes.reviews import reviews_bp
 from routes.wishlist import wishlist_bp
 from routes.admin import admin_bp
@@ -17,11 +20,14 @@ def create_app():
     
     # Initialize extensions
     db.init_app(app)
+    JWTManager(app)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
     
     # Register blueprints
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(tours_bp, url_prefix='/api/tours')
     app.register_blueprint(bookings_bp, url_prefix='/api/bookings')
+    app.register_blueprint(payments_bp, url_prefix='/api/payments')
     app.register_blueprint(reviews_bp, url_prefix='/api/reviews')
     app.register_blueprint(wishlist_bp, url_prefix='/api/wishlist')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
